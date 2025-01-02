@@ -13,7 +13,7 @@ def raschot(utc_time, lon, lat, alt, horizon, mH, length):
     h=0 #Высота спутника (град)
     n=0
     a=[]
-    sats=['METEOR M2-3', 'METEOR M2-4', 'NOAA-18', 'NOAA-19', 'METOP-B', 'METOP-C']
+    sats=['METEOR M2-3', 'METEOR M2-4', 'NOAA-15', 'NOAA-18', 'NOAA-19', 'METOP-B', 'METOP-C']
     orbital = Orbital('METEOR M2-3', tle_file=tle)
     passTimes=orbital.get_next_passes(utc_time, length, lon, lat, alt, tol=0.0001, horizon=horizon)
     while i<len(sats):
@@ -158,11 +158,6 @@ def view():
         return render_template('index3.html', title='trajectory', info=sat)
     else:
         return jsonify(trajectory)
-
-# @app.route('/pass/')
-# def sendpass():
-#     trajectory=tra('NOAA 18', datetime(2024, 11, 30, 15, 0), 77, 60, 0, 0, True)
-#     return jsonify(trajectory)
 
 @app.route("/forward/", methods=['GET','POST'])
 def forward():

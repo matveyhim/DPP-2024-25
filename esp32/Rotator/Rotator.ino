@@ -8,8 +8,8 @@ GStepper<STEPPER2WIRE> stepAZ(320000, 27, 26, 25);
 #define numLeds 8
 #define brightness 50
 
-#define Xend 32
-#define Yend 33
+#define Xend 32 // elevation / X axis
+#define Yend 33 // azimuth / Y axis
 
 bool testMode=false;
 bool parking=false;
@@ -22,7 +22,7 @@ float azSet;
 float elSet;
 TaskHandle_t Task1;
 
-Adafruit_NeoPixel pix(numLeds, ledPin, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel pix(numLeds, ledPin, NEO_GRB + NEO_KHZ800);
 
 void printAzEl() {
   SerialPort.print("AZ");
@@ -33,32 +33,31 @@ void printAzEl() {
 }
 
 void cal(){
-  for(int i=0; i<numLeds; i++) {
-    pix.setPixelColor(i, pix.Color(255, 0, 0));
-    pix.show();
-  }
+  fillStrip(255,0,0); // red, started
   
   stepAZ.setRunMode(KEEP_SPEED);
   stepAZ.setSpeedDeg(10);
-  while(digitalRead(Xend)==0 and stepEL.getCurrentDeg()<=180) {
+  while(digitalRead(Xend)==0 and stepAZ.getCurrentDeg()<=180) {
     stepAZ.tick();
-    if (stepAZ.getCurrentDeg()>180) while(1){fillStrip(255,0,0); delay(200); fillStrip(0,0,0); delay(200); vTaskDelay(1);}
+    if (stepAZ.getCurrentDeg()>180) while(1){
+      calError();
+    }
   }
 
   stepAZ.setCurrentDeg(95);
   stepAZ.setRunMode(FOLLOW_POS);
-  stepAZ.setTargetDeg(0,ABSOLUTE);
+  stepAZ.setTargetDeg(0, ABSOLUTE);
   while(stepAZ.tick() and !testMode) {stepAZ.tick();}
-  for(int i=0; i<numLeds; i++) {
-    pix.setPixelColor(i, pix.Color(255, 70, 0));
-    pix.show();
-  }
+  
+  fillStrip(255,70,0); // yellow, half complete
   
   stepEL.setRunMode(KEEP_SPEED);
   stepEL.setSpeedDeg(10);
-  while(digitalRead(Yend)==0) {
+  while(digitalRead(Yend)==0 and stepEL.getCurrentDeg()<=180) {
     stepEL.tick();
-    if (stepEL.getCurrentDeg()>180) while(1){fillStrip(255,0,0); delay(200); fillStrip(0,0,0); delay(200); vTaskDelay(1);}
+    if (stepEL.getCurrentDeg()>180) while(1){
+        calError();
+    }
   }
 
   stepEL.setCurrentDeg(80);
@@ -67,10 +66,16 @@ void cal(){
   while(stepEL.tick() and !testMode) {
     stepEL.tick();
   }
-  for(int i=0; i<numLeds; i++) {
-    pix.setPixelColor(i, pix.Color(0, 255, 0));
-    pix.show();
-  }
+
+  fillStrip(0,255,0); // green, completed
+}
+
+void calError(){
+  fillStrip(255,0,0);
+  delay(200);
+  fillStrip(0,0,0);
+  delay(200);
+  vTaskDelay(1);
 }
 
 void fillStrip(int r, int g, int b){
@@ -176,7 +181,7 @@ void loop() {
         param = line.substring(firstSpace + 3, secondSpace);//Get the second parameter
         elSet = param.toFloat();                            //Set the elSet value
       } else if (line.indexOf("calibration")!=-1) {
-      cal();
+        cal();
       }
     }
   }

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html class="html" lang="en">
+  <main class="main">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <a href='/'>Домой</a>
+    <a href='/control/'>Управление</a>
+    <a href='/forward/'>Расписание</a>
+  </head>
+  <body>
+      <label class="start"> Начало расчёта <input type="datetime-local" name="length"></label>
+      {{ tableData }}
+  </body>
+  <style>
+    .table{
+      color: rgb(255, 255, 255);
+    }
+    .html {
+      background-color: rgb(30, 30, 30);
+      font-family:sans-serif;
+    }
+    td{
+      margin-left: 50px;
+      /* position: absolute; */
+      color: rgb(30, 255, 0);
+      width: 1%;
+      text-align: center;
+    }
+    tr{
+      color: rgb(0, 255, 255);
+    }
+    .inputlabel{
+      color: rgb(0, 255, 255);
+    }
+  </style>
+</html>

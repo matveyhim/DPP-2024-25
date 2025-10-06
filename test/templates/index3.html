@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html class="html" lang="en">
+  <main class="main">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>{{ title }}</title>
+    </head>
+    <body>
+      <div class="traj">
+        <h4 class="info">{{ info }}</h4>
+        <canvas width="400" height="400"></canvas>
+      </div>
+    </body>
+    <style>
+      .traj{
+        width: 400px;
+        height: 400px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+      }
+      .info{
+        color: rgb(30, 255, 0);;
+      }
+      .html {
+        background-color: rgb(30, 30, 30);
+        font-family:sans-serif;
+      }
+    </style>
+    <script>
+      var points
+      const canvas = document.querySelector("canvas");
+      const ctx = canvas.getContext("2d");
+
+      function getPass(){
+        const url='/view/';
+        fetch(url)
+        .then((response=>{
+          return response.text();
+        }))
+        .then((data)=>{
+          // let res=data;
+          var points = JSON.parse(data);
+          drawPass(points);
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+      }
+
+      function drawPass(points){
+        ctx.strokeStyle  = "rgb(30,255,0)";
+        ctx.beginPath();
+        ctx.arc(200, 200, 60, 0, Math.PI * 2, true);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(200, 200, 120, 0, Math.PI * 2, true);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(200, 200, 180, 0, Math.PI * 2, true);
+        ctx.stroke();
+        ctx.closePath();  
+        ctx.beginPath();
+        ctx.moveTo(200, 20);
+        ctx.lineTo(200, 380);
+        ctx.moveTo(20, 200);
+        ctx.lineTo(380, 200);
+        ctx.stroke();
+        ctx.closePath();     
+
+        var angle=points[0].x
+        var x=0
+        var y=90-points[0].y
+        point=rotate(x,y,angle)
+
+        ctx.strokeStyle  = "rgba(255,0,0,1)";
+        ctx.fillStyle  = "rgba(255,0,0,1)";
+        ctx.beginPath();
+        ctx.moveTo(400-(point.x+98)*2, 400-(point.y+100)*2);
+        ctx.arc(400-(point.x+100)*2, 400-(point.y+100)*2, 4, 0, Math.PI * 2, true);
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.strokeStyle ="rgb(255,172,18)";
+        ctx.beginPath();
+        for (var i = 0; i < points.length-1; i++) {
+          var angle=points[i].x
+          var x=0
+          var y=90-points[i].y
+          var point=rotate(x,y,angle)
+          ctx.moveTo(400-(point.x+100)*2, 400-(point.y+100)*2);
+
+          var angle=points[i+1].x
+          var y=90-points[i+1].y
+          point=rotate(x,y,angle)
+          ctx.lineTo(400-(point.x+100)*2, 400-(point.y+100)*2);
+        }
+        ctx.stroke();
+        ctx.closePath();
+      }
+      function rotate(x,y,angle){
+        angler = angle*Math.PI/180
+        newx = x*Math.cos(angler) - y*Math.sin(angler)
+        newy = x*Math.sin(angler) + y*Math.cos(angler)
+        return {x:newx,y:newy}
+      }
+      getPass();
+    </script>
+  </main>
+</html>

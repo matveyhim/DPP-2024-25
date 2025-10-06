@@ -1,0 +1,364 @@
+{% block content %}
+  <head class="head">
+    <title>Нет связи</title>
+    <a href='/'>Домой</a>
+    <a href='/control/'>Управление</a>
+    <a href='/forward/'>Расписание</a>
+  </head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://webmap-blog.ru/examples/add-users-ymapsapi2/css/bootstrap.min.css" rel="stylesheet" />
+  <header class="header">
+  </header>
+  <main class="main">
+                <div>
+                  <select id="satselect" aria-placeholder="satellite">
+                    {% for sat in sats %}
+                    <option name="sats" value="{{sat}}">{{sat}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="state-sel">
+                  <div>
+                    <button type="submit" id="startBtn" onclick = start() class="start-btn">Track</button>
+                  </div>
+                  <div>
+                    <button type="submit" id="homeBtn" onclick = home() class="home-btn">Home</button>
+                  </div>
+                  <div>
+                    <button type="submit" id="man" onclick = man() class="elCtrl">Manual</button>
+                  </div>
+                  <div>
+                    <button type="submit" id="cal" onclick = cal() class="calibrate">Calibrate</button>
+                  </div>
+                </div>
+                <div class="man-position">
+                  <div>
+                    <button type="submit" id="elIncr" onclick = elInc() class="elCtrl">EL+</button>
+                  </div>
+                  <div class="satinfo">
+                    <button type="submit" id="azIncr" onclick = azInc() class="azCtrl">AZ+</button>
+                    <button type="submit" id="azDecr" onclick = azDec() class="azCtrl">AZ-</button>
+                  </div>
+                  <div>
+                    <button type="submit" id="elDecr" onclick = elDec() class="elCtrl">EL-</button>
+                  </div>
+                </div>
+              <style>
+                .satinfo div{display: inline-block;}
+                .header {
+                  width: 100%;
+                  background: #54b6ee;
+                  position: fixed;
+                  left: 0;
+                  top: 0;
+                  padding-bottom: 15px;
+                  z-index: -10;
+                }
+                .main{
+                  margin-top: 20px;
+                }
+              </style>
+              <ul id="pos">
+                <div class="satinfo">
+                  <div><a>Спутник: </a></div>
+                  <div><a id="sat"></a></div>
+
+                  <div><a>следующий: </a></div>
+                  <div><a id="nextsat"></a></div>
+
+                  <div><a> в </a></div>
+                  <div><a id="nexttime"></a></div>
+                </div>
+
+                <div class="satinfo">
+                  <div><a>Состояние ОПУ: </a></div>
+                  <div><a id="tracking"></a></div>
+                </div>
+
+                <div class="satinfo">
+                  <div><a>Азимут: </a></div>
+                  <div><a id="az"></a></div>
+                </div>
+
+                <div class="satinfo">
+                  <div><a> факт: </a></div>
+                  <div><a id="TRaz"></a></div>
+                </div>
+
+                <div class="satinfo">
+                  <div><a>Возвышение: </a></div>
+                  <div><a id="el"></a></div>
+                </div>
+
+                <div class="satinfo">
+                  <div><a> факт: </a></div>
+                  <div><a id="TRel"></a></div>
+                </div>
+
+                <div class="satinfo">
+                  <div><a>UTC: </a></div>
+                  <div><a id="time"></a></div>
+                </div>
+              </ul>
+    <script>
+      var sats;
+      var tracking;
+      tracking=false;
+
+      window.onkeydown = function(event){
+        if(event.key === "w"){
+          elInc();
+        }
+        if(event.key === "a"){
+          azDec();
+        }
+        if(event.key === "s"){
+          elDec();
+        }
+        if(event.key === "d"){
+          azInc();
+        }
+      }
+
+      window.onload = function() {
+        const satselect=document.getElementById('satselect');
+        if (tracking==true){
+          document.getElementById('tracking').innerText = 'Сопровождение'
+        }else if(tracking==false){
+          document.getElementById('tracking').innerText = 'Останов'
+        }else if(tracking=='home'){
+          document.getElementById('tracking').innerText = 'Парковка'
+        }
+      }
+
+      satselect.onchange = function() {
+        const url='/';
+
+        sats=satselect.value
+        let data={
+          sat:sats
+        }
+      
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+
+          })
+      }
+
+      function start(){
+        const url='/track/';
+        var trkState
+        tracking=!tracking
+        sats=satselect.value
+        let data={
+          sat:sats,
+          track:tracking
+        }
+        
+        if (tracking==true){
+          document.getElementById('tracking').innerText = 'Сопровождение'
+        }else if(tracking==false){
+          document.getElementById('tracking').innerText = 'Останов'
+        }else if(tracking=='home'){
+          document.getElementById('tracking').innerText = 'Парковка'
+        }
+      
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+
+          })
+      }
+
+      function man(){
+        const url='/track/';
+        sats=satselect.value
+        let data={sat:sats, track:'man'}
+
+        document.getElementById('tracking').innerText = 'Вручную'
+
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+        })
+      }
+     
+      function cal(){
+        const url='/track/';
+        sats=satselect.value
+        let data={sat:sats, track:'cal'}
+
+        document.getElementById('tracking').innerText = 'Калибровка'
+
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+        })
+      }
+
+      function home(){
+        const url='/track/';
+        tracking='home'
+        sats=satselect.value
+        let data={
+          sat:sats,
+          track:tracking
+        }
+
+        document.getElementById('tracking').innerText = 'Парковка'
+      
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+
+          })
+      }
+
+      function azInc(){
+        const url='/track/';
+        let data={dir:'AZincr'}
+
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+        })
+      }
+
+      function azDec(){
+        const url='/track/';
+        let data={dir:'AZdecr'}
+
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+        })
+      }
+
+      function elInc(){
+        const url='/track/';
+        let data={dir:'ELincr'}
+
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+        })
+      }
+
+      function elDec(){
+        const url='/track/';
+        let data={dir:'ELdecr'}
+
+        let fetchData={
+          method:'POST',
+          body: JSON.stringify(data),
+          headers: new Headers({
+            'Content-Type':'application/json; charset=UTF-8'
+          })
+        }
+        fetch(url,fetchData)
+          .then(function(){
+        })
+      }
+
+      function satpos(){
+      const url='/json/';
+      fetch(url)
+        .then((response=>{
+          return response.json();
+        }))
+        .then((data)=>{
+          let res=data;
+          
+          var sat = res.pos.sat
+          var azi = res.pos.az
+          var elev= res.pos.el
+          var curAz = res.pos.curAz
+          var curEl = res.pos.curEl
+          var time= res.pos.time
+
+          document.getElementById('sat').innerText = sat;
+          document.getElementById('az').innerText = azi;
+          document.getElementById('el').innerText = elev;
+          document.getElementById('TRaz').innerText = curAz;
+          document.getElementById('TRel').innerText = curEl;
+          document.getElementById('time').innerText = time;
+        })
+          .catch(function(error){
+            console.log(error);
+          });
+          setTimeout(satpos, 1000);
+      }
+
+      function predict(){
+      const url='/nextsat/';
+      fetch(url)
+        .then((response=>{
+          return response.json();
+        }))
+        .then((data)=>{
+          let res=data;
+          
+          var nextsat = res.pos.nextsat
+          var nexttime = res.pos.nexttime
+          document.getElementById('nextsat').innerText = nextsat;
+          document.getElementById('nexttime').innerText = nexttime;
+        })
+          .catch(function(error){
+            console.log(error);
+          });
+          setTimeout(predict, 10000);
+      }
+      satpos();
+      predict();
+    </script>
+  </main>
+  {% endblock %}

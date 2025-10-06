@@ -1,0 +1,28 @@
+
+html, body, #YMapsID {
+margin-top: 8%;
+margin-bottom: 0%;
+padding: 0;
+height: 80%;
+}
+
+.head{
+    width: 100%;
+    background: #54b6ee;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-bottom: 15px;
+    z-index: 2;
+}
+
+#coord_form{
+position: absolute;
+z-index: 1000;
+background: none repeat scroll 0% 0% rgb(255, 255, 255);
+list-style: none outside none;
+padding: 10px;
+margin: 0px;
+right: 170px;
+top: 5px;
+}
